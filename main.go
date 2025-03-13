@@ -97,7 +97,7 @@ func addNewTask(path, taskStr string) error {
 
 }
 
-func showTasks(path string) error {
+func outputTasks(path string) error {
 	tasks, err := readTasks(path)
 	if err != nil {
 		return err
@@ -115,14 +115,37 @@ func showTasks(path string) error {
 	return nil
 }
 
+func deleteTask(path, taskToDel string) error {
+	tasks, err := readTasks(path)
+
+	if err != nil {
+		return err
+	}
+
+	var updatedTasks []Task
+
+	for _, task := range tasks {
+		if task.Desc == taskToDel {
+			continue
+		}
+		updatedTasks = append(updatedTasks, task)
+	}
+
+	return saveTasks(path, updatedTasks)
+}
+
 func main() {
 
 	cfg := Config{}
 	var addTask string
+	var showTasks bool
+	var taskToDelete string
 
 	flag.StringVar(&cfg.path, "path", "tasks.json", "Path to tasks file")
 	flag.StringVar(&addTask, "add_task", "", "Add new task in fmt: 'description, start, deadline'")
-	show_tasks := flag.Bool("show", false, "Output all your tasks")
+	flag.BoolVar(&showTasks, "show", false, "Output all your tasks")
+	flag.StringVar(&taskToDelete, "del", "", "Delete ALL tasks w this desc")
+
 	flag.Parse()
 
 	if addTask != "" {
@@ -133,10 +156,18 @@ func main() {
 		fmt.Println("Task added!")
 	}
 
-	if *show_tasks {
-		err := showTasks(cfg.path)
+	if *&showTasks {
+		err := outputTasks(cfg.path)
 		if err != nil {
 			fmt.Printf("Error showing tasks: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	if taskToDelete != "" {
+		err := deleteTask(cfg.path, taskToDelete)
+		if err != nil {
+			fmt.Printf("Error while deleting task '%s': %v\n", taskToDelete, err)
 			os.Exit(1)
 		}
 	}
