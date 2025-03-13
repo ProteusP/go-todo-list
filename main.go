@@ -156,7 +156,7 @@ func main() {
 		fmt.Println("Task added!")
 	}
 
-	if *&showTasks {
+	if showTasks {
 		err := outputTasks(cfg.path)
 		if err != nil {
 			fmt.Printf("Error showing tasks: %v\n", err)
@@ -170,5 +170,6 @@ func main() {
 			fmt.Printf("Error while deleting task '%s': %v\n", taskToDelete, err)
 			os.Exit(1)
 		}
+		fmt.Printf("Task(s) '%s' deleted!\n", taskToDelete)
 	}
 }
