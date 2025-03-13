@@ -97,6 +97,24 @@ func addNewTask(path, taskStr string) error {
 
 }
 
+func showTasks(path string) error {
+	tasks, err := readTasks(path)
+	if err != nil {
+		return err
+	}
+
+	tasksCount := len(tasks)
+	fmt.Printf("You got %d tasks:\n", tasksCount)
+	if tasksCount != 0 {
+
+		fmt.Println("id")
+		for id, task := range tasks {
+			fmt.Printf("%d |	Desc: %s		Started: %s		Dedline: %s		Status: %s\n", id+1, task.Desc, task.Start, task.Deadline, task.Status)
+		}
+	}
+	return nil
+}
+
 func main() {
 
 	cfg := Config{}
@@ -104,7 +122,7 @@ func main() {
 
 	flag.StringVar(&cfg.path, "path", "tasks.json", "Path to tasks file")
 	flag.StringVar(&addTask, "add_task", "", "Add new task in fmt: 'description, start, deadline'")
-
+	show_tasks := flag.Bool("show", false, "Output all your tasks")
 	flag.Parse()
 
 	if addTask != "" {
@@ -113,5 +131,13 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println("Task added!")
+	}
+
+	if *show_tasks {
+		err := showTasks(cfg.path)
+		if err != nil {
+			fmt.Printf("Error showing tasks: %v\n", err)
+			os.Exit(1)
+		}
 	}
 }
